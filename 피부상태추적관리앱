@@ -86,7 +86,12 @@ AI 모델로 이미지 분석 → 결과 상태 저장
 분석된 질환 결과 표시 → 다시 분석 가능
 - OTA 업데이트 자동 반영
 
-
+3. 개발도구설치
+1) Node.js(React Native)
+C:\Windows\System32>node -v
+v22.14.0
+C:\Windows\System32>npm -v
+10.9.2
 
 
 
