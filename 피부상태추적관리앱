@@ -1,0 +1,98 @@
+[ 프로젝트 : 피부상태추적관리앱 ]
+
+1. 기능
+- 사진 촬영 및 갤러리에서 이미지 업로드
+- AI (TensorFlow.js) 기반 간단한 피부질환 분류
+- Code Push (OTA 업데이트) 연동
+- Figma 디자인 반영 — 최신 UI 트렌드
+- React Query + Zustand로 상태 관리 및 API 연동
+
+2. 상세기능
+1) 사진 촬영 및 갤러리에서 이미지 업로드
+사진 촬영 또는 갤러리에서 이미지 선택
+선택한 이미지 상태 관리 (미리보기 & AI 분석 연동)
+- 사용 도구
+expo-image-picker: 카메라, 갤러리 접근
+Zustand: 이미지 상태 관리
+- 설계 흐름
+1) 홈 화면
+촬영 버튼 (expo-image-picker → 카메라 열기)
+갤러리 버튼 (expo-image-picker → 갤러리 열기)
+선택한 이미지 상태 저장 (Zustand)
+이미지 미리보기
+
+2) AI (TensorFlow.js) 기반 피부질환 분석
+선택된 이미지를 AI 모델에 전달해 피부질환 예측
+예측 결과를 UI에 반영
+- 사용 도구
+@tensorflow/tfjs
+mobilenet or 커스텀 모델 (TensorFlow.js)
+- 설계 흐름
+1) AI 모델 불러오기
+mobilenet 사전학습 모델 로드
+커스텀 모델 학습 후 교체 가능
+2) 이미지 분석 로직
+이미지를 모델에 전달 (tf.browser.fromPixels())
+예측된 질환 결과 반환
+
+3) Code Push (OTA 업데이트)
+코드 변경 사항을 앱스토어 심사 없이 업데이트 배포
+- 사용 도구
+react-native-code-push (Microsoft App Center 연동)
+- 설계 흐름
+1) Code Push 설정
+AppCenter에 iOS 앱 등록
+react-native-code-push 설정 및 초기화
+2) 업데이트 체크 로직
+앱 실행 시 업데이트 체크 (CheckFrequency.ON_APP_START)
+새 업데이트 있으면 자동 반영
+
+4) Figma 디자인 반영 (최신 UI 트렌드)
+최신 iOS 디자인 트렌드 (Glassmorphism, Card UI 등)
+UX/UI 구성 반영
+- 사용 도구
+Figma: 디자인 설계
+React Native 스타일링 (Tailwind-like NativeWind 가능)
+- 설계 흐름
+Splash 화면
+로고 & 로딩 애니메이션 (Lottie 사용 가능)
+2) 메인 화면 디자인
+버튼: 카드형 UI
+이미지 미리보기 영역: Soft Shadow 스타일링
+3) 분석 결과 화면
+분석 결과 카드
+"재분석" 버튼 디자인
+
+5) React Query + Zustand 상태 관리 및 API 연동
+분석 결과 API 연동 (백엔드 서버 연결 시)
+상태 관리 (React Query → API 데이터 / Zustand → 클라이언트 상태)
+- 사용 도구
+axios: API 호출
+React Query: 데이터 캐싱 & 리프레시
+Zustand: 이미지, 결과 상태 관리
+- 설계 흐름
+1) React Query API 연동
+2) React Query 데이터 관리
+3) 상태 관리 연동
+분석 결과 상태 → Zustand 저장
+API 성공 시 UI 업데이트
+
+6) 최종 기능 흐름 정리
+- 홈 화면
+카메라 촬영 / 갤러리 이미지 선택 → 상태 저장
+- 분석 화면
+AI 모델로 이미지 분석 → 결과 상태 저장
+- 결과 화면
+분석된 질환 결과 표시 → 다시 분석 가능
+- OTA 업데이트 자동 반영
+
+
+
+
+
+
+
+
+
+
+
