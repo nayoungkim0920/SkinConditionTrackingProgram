@@ -1,103 +1,177 @@
 [ 프로젝트 : 피부상태추적관리앱 ]
 
-1. 기능
-- 사진 촬영 및 갤러리에서 이미지 업로드
-- AI (TensorFlow.js) 기반 간단한 피부질환 분류
-- Code Push (OTA 업데이트) 연동
-- Figma 디자인 반영 — 최신 UI 트렌드
-- React Query + Zustand로 상태 관리 및 API 연동
+1. 목표
+피부상태를 진단하고 추적하여 관리
 
-2. 상세기능
-1) 사진 촬영 및 갤러리에서 이미지 업로드
-사진 촬영 또는 갤러리에서 이미지 선택
-선택한 이미지 상태 관리 (미리보기 & AI 분석 연동)
-- 사용 도구
-expo-image-picker: 카메라, 갤러리 접근
-Zustand: 이미지 상태 관리
-- 설계 흐름
-1) 홈 화면
-촬영 버튼 (expo-image-picker → 카메라 열기)
-갤러리 버튼 (expo-image-picker → 갤러리 열기)
-선택한 이미지 상태 저장 (Zustand)
-이미지 미리보기
+2. 설계
+1) 로그인
+기능: 사용자는 이메일과 비밀번호로 로그인하거나, 소셜 로그인 (카카오, 구글 등)을 통해 로그인을 할 수 있습니다.
+추가 기능: 이중 인증 (2FA) 또는 얼굴 인식 로그인으로 보안을 강화할 수 있습니다.
+기술: Firebase Authentication, OAuth 2.0
+2) 사진 촬영 및 갤러리에서 이미지 업로드
+기능: 사용자는 피부 상태를 사진으로 찍어 업로드하거나 갤러리에서 이미지를 선택할 수 있습니다.
+추가 기능: 실시간 필터링 (사진을 찍을 때 피부 질환의 경미한 징후를 자동으로 감지하여 사용자에게 알림을 제공)
+기술: Expo Camera, React Native Image Picker
+3) AI (TensorFlow.js) 기반 피부질환 분류
+기능: AI 모델을 사용하여 사용자가 업로드한 이미지에서 피부 질환을 분석합니다. 예를 들어, 여드름, 아토피, 습진 등.
+추가 기능: AI 모델의 신뢰도를 사용자에게 표시하고, AI 분석 결과에 따른 관리 방법을 제시하는 기능 추가.
+기술: TensorFlow.js, MobileNet 등
+4) 간단한 문진 기록
+기능: 사용자가 피부 상태와 관련된 문진을 작성합니다. 예를 들어, 증상, 발병 시기, 생활 습관 등에 대한 질문을 통해 분석을 보조합니다.
+추가 기능: 자동 추천 문진 기능 (AI가 이전 데이터를 분석하여 필요한 문진 항목을 자동 추천)
+기술: React Hook Form, Zustand 상태 관리
+5) Figma 디자인 반영 — 최신 UI 트렌드
+기능: 최신 UI/UX 트렌드를 반영한 디자인 적용 (예: 미니멀한 디자인, 자연스러운 애니메이션, 다크모드)
+추가 기능: 접근성을 고려한 디자인 (색상 대비, 글자 크기 조정, 음성 인식 지원 등)
+기술: Figma, React Native Paper, React Navigation
+6) React Query + Zustand로 상태 관리 및 API 연동
+기능: 데이터 fetching과 상태 관리를 효율적으로 처리하여 UI 성능을 최적화합니다.
+추가 기능: 서버 사이드 렌더링(SSR) 지원, 에러 핸들링 및 캐싱
+기술: React Query, Zustand, Axios
+7) Web 서비스 제공
+기능: 웹 기반으로도 사용자가 피부 질환을 관리할 수 있도록 웹 서비스를 제공합니다.
+추가 기능: 모바일과 동일한 기능을 웹에서 제공, 반응형 디자인
+기술: React.js, Next.js, Firebase Hosting
+8) 추가 기능 제안
+피부 상태 추적: 사용자가 일주일, 한 달 단위로 피부 상태 변화를 기록하고 추적할 수 있는 기능. (사진과 문진 기록을 통해 변화를 시각적으로 확인)
+9) 추가 기능
+AI 기반 추천 시스템: AI가 분석한 피부 상태를 바탕으로 사용자에게 맞춤형 피부 관리 팁을 제공합니다. 예를 들어, 어떤 크림이나 제품이 적합할지 추천.
+커뮤니티 기능: 사용자 간의 피부 질환 관리 경험을 공유할 수 있는 포럼이나 채팅 기능.
+상담 기능: 피부 전문가와의 1:1 상담 예약 및 진행.
+QR 코드 생성: 병원 방문 시 의사에게 빠르게 피부 상태를 공유할 수 있도록 QR 코드 생성 기능.
 
-2) AI (TensorFlow.js) 기반 피부질환 분석
-선택된 이미지를 AI 모델에 전달해 피부질환 예측
-예측 결과를 UI에 반영
-- 사용 도구
-@tensorflow/tfjs
-mobilenet or 커스텀 모델 (TensorFlow.js)
-- 설계 흐름
-1) AI 모델 불러오기
-mobilenet 사전학습 모델 로드
-커스텀 모델 학습 후 교체 가능
-2) 이미지 분석 로직
-이미지를 모델에 전달 (tf.browser.fromPixels())
-예측된 질환 결과 반환
+3. 데이터베이스 설계
 
-3) Code Push (OTA 업데이트)
-코드 변경 사항을 앱스토어 심사 없이 업데이트 배포
-- 사용 도구
-react-native-code-push (Microsoft App Center 연동)
-- 설계 흐름
-1) Code Push 설정
-AppCenter에 iOS 앱 등록
-react-native-code-push 설정 및 초기화
-2) 업데이트 체크 로직
-앱 실행 시 업데이트 체크 (CheckFrequency.ON_APP_START)
-새 업데이트 있으면 자동 반영
-
-4) Figma 디자인 반영 (최신 UI 트렌드)
-최신 iOS 디자인 트렌드 (Glassmorphism, Card UI 등)
-UX/UI 구성 반영
-- 사용 도구
-Figma: 디자인 설계
-React Native 스타일링 (Tailwind-like NativeWind 가능)
-- 설계 흐름
-Splash 화면
-로고 & 로딩 애니메이션 (Lottie 사용 가능)
-2) 메인 화면 디자인
-버튼: 카드형 UI
-이미지 미리보기 영역: Soft Shadow 스타일링
-3) 분석 결과 화면
-분석 결과 카드
-"재분석" 버튼 디자인
-
-5) React Query + Zustand 상태 관리 및 API 연동
-분석 결과 API 연동 (백엔드 서버 연결 시)
-상태 관리 (React Query → API 데이터 / Zustand → 클라이언트 상태)
-- 사용 도구
-axios: API 호출
-React Query: 데이터 캐싱 & 리프레시
-Zustand: 이미지, 결과 상태 관리
-- 설계 흐름
-1) React Query API 연동
-2) React Query 데이터 관리
-3) 상태 관리 연동
-분석 결과 상태 → Zustand 저장
-API 성공 시 UI 업데이트
-
-6) 최종 기능 흐름 정리
-- 홈 화면
-카메라 촬영 / 갤러리 이미지 선택 → 상태 저장
-- 분석 화면
-AI 모델로 이미지 분석 → 결과 상태 저장
-- 결과 화면
-분석된 질환 결과 표시 → 다시 분석 가능
-- OTA 업데이트 자동 반영
-
-3. 개발도구설치
-1) Node.js(React Native)
-C:\Windows\System32>node -v
-v22.14.0
-C:\Windows\System32>npm -v
-10.9.2
++----------------+           +-----------------+           +------------------------+
+|    Users       |           |     Photos      |           |   Skin Conditions      |
++----------------+           +-----------------+           +------------------------+
+| user_id (PK)   |<--+     +--| photo_id (PK)   |<----+   +--| condition_id (PK)      |
+| name           |    |     | user_id (FK)     |     |   | name                   |
+| email          |    |     | photo_url        |     |   | description            |
+| password       |    |     | created_at       |     |   | treatment_suggestions  |
++----------------+    |     +-----------------+     |   +------------------------+
+                      |                             |
+                      |                             |
+                      |                             |
+              +-------+----------------------------+------------------------+
+              |          Skin Tracking                                      |
+              | +-------------------------+         +--------------------+ |
+              | | tracking_id (PK)        |<----+   | ai_analysis_id (PK) |
+              | | user_id (FK)            |         | result              |
+              | | photo_id (FK)           |         | confidence_level    |
+              | | condition_id (FK)       |         | created_at          |
+              | | created_at              |         +--------------------+ |
+              +--------------------------+                             |
+                      |                                                   |
+                      +---------------------------------------------------+
 
 
+--사용자 테이블 (users)
+CREATE TABLE users (
+    user_id INT PRIMARY KEY IDENTITY(1,1),
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(100),
+    phone_number VARCHAR(15),
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE()
+);
+
+INSERT INTO users (email, password, name, phone_number)
+VALUES ('user1@example.com', 'hashedpassword123', '홍길동', '01012345678');
+
+--사진 기록 테이블 (photos)
+CREATE TABLE photos (
+    photo_id INT PRIMARY KEY IDENTITY(1,1),
+    user_id INT,
+    photo_url VARCHAR(255),
+    ai_result VARCHAR(255),
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+INSERT INTO photos (user_id, photo_url, ai_result)
+VALUES (1, 'https://example.com/photo1.jpg', '여드름');
+
+--문진 기록 테이블 (questionnaire)
+CREATE TABLE questionnaire (
+    questionnaire_id INT PRIMARY KEY IDENTITY(1,1),
+    user_id INT,
+    symptoms VARCHAR(500),
+    lifestyle VARCHAR(500),
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+INSERT INTO questionnaire (user_id, symptoms, lifestyle)
+VALUES (1, '피부에 붉은 발진이 나타나고 간지러움', '피부에 자극이 되는 화장품 사용');
+
+--피부 질환 정보 테이블 (skin_conditions)
+CREATE TABLE skin_conditions (
+    condition_id INT PRIMARY KEY IDENTITY(1,1),
+    name VARCHAR(255),
+    description TEXT,
+    treatment_suggestions TEXT
+);
+
+INSERT INTO skin_conditions (name, description, treatment_suggestions)
+VALUES 
+('여드름', '여드름은 피부의 모공이 막히고 염증이 발생하는 상태입니다. 주로 얼굴, 가슴, 등 부위에 나타납니다.',
+ '피부를 청결하게 유지하고, 과도한 유분을 제거하는 제품 사용을 권장합니다. 또한, 항균제나 레티노이드 제품 사용을 고려할 수 있습니다.'),
+
+('아토피 피부염', '아토피 피부염은 피부에 염증과 가려움증을 동반하는 만성적인 피부 질환입니다.',
+ '보습제를 자주 바르고, 자극적인 화장품 사용을 피해야 합니다. 증상이 심할 경우, 의사의 처방에 따라 스테로이드제나 면역조절제를 사용합니다.'),
+
+('건선', '건선은 피부가 빨갛고 비늘 모양으로 부풀어오르는 만성적인 피부 질환입니다.',
+ '보습제를 사용하고, 햇볕을 적당히 쬐며, 의사 처방에 따라 비타민 D 유도체나 스테로이드제를 사용할 수 있습니다.'),
+
+('습진', '습진은 피부가 가려운 붉은 반점이나 수포가 생기는 염증성 피부 질환입니다.',
+ '피부를 건조하게 만들지 않도록 보습을 꾸준히 하고, 자극을 줄이는 피부 제품을 사용하는 것이 중요합니다.'),
+
+('피지낭종', '피지낭종은 피부에 발생하는 비정상적인 피지 선 덩어리입니다.',
+ '대부분은 치료가 필요하지 않지만, 염증이 발생하거나 커질 경우 수술적 제거가 필요할 수 있습니다.');
 
 
+--피부 상태 추적 테이블 (skin_tracking)
+CREATE TABLE skin_tracking (
+    tracking_id INT PRIMARY KEY IDENTITY(1,1),
+    user_id INT,
+    photo_id INT,
+    condition_id INT,
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (photo_id) REFERENCES photos(photo_id),
+    FOREIGN KEY (condition_id) REFERENCES skin_conditions(condition_id)
+);
 
+INSERT INTO skin_tracking (user_id, photo_id, condition_id, created_at)
+VALUES 
+(1, 101, 1, '2025-03-01 10:00:00'),
+(1, 102, 2, '2025-03-02 11:30:00'),
+(2, 103, 3, '2025-03-02 12:00:00'),
+(2, 104, 4, '2025-03-03 14:00:00'),
+(3, 105, 5, '2025-03-04 09:30:00'),
+(3, 106, 1, '2025-03-04 10:30:00'),
+(4, 107, 2, '2025-03-05 15:00:00'),
+(4, 108, 3, '2025-03-06 16:00:00');
 
+--AI 분석 기록 테이블 (ai_analysis)
+CREATE TABLE ai_analysis (
+    analysis_id INT PRIMARY KEY IDENTITY(1,1),
+    photo_id INT,
+    result VARCHAR(255),
+    confidence_level FLOAT,
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (photo_id) REFERENCES photos(photo_id)
+);
 
-
-
+INSERT INTO ai_analysis (photo_id, result, confidence_level, created_at)
+VALUES 
+(101, '여드름', 0.92, '2025-03-01 10:05:00'),
+(102, '아토피 피부염', 0.87, '2025-03-02 11:35:00'),
+(103, '건선', 0.85, '2025-03-02 12:05:00'),
+(104, '습진', 0.90, '2025-03-03 14:05:00'),
+(105, '피지낭종', 0.95, '2025-03-04 09:35:00'),
+(106, '여드름', 0.88, '2025-03-04 10:35:00'),
+(107, '아토피 피부염', 0.91, '2025-03-05 15:05:00'),
+(108, '건선', 0.89, '2025-03-06 16:05:00');
