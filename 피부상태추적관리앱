@@ -3,6 +3,9 @@
 1. 목표
 피부상태를 진단하고 추적하여 관리
 
+2. 개발도구 
+React, Firebase
+
 2. 설계
 1) 로그인
 기능: 사용자는 이메일과 비밀번호로 로그인하거나, 소셜 로그인 (카카오, 구글 등)을 통해 로그인을 할 수 있습니다.
@@ -36,195 +39,850 @@
 피부 상태 추적: 사용자가 일주일, 한 달 단위로 피부 상태 변화를 기록하고 추적할 수 있는 기능. (사진과 문진 기록을 통해 변화를 시각적으로 확인)
 9) 추가 기능
 AI 기반 추천 시스템: AI가 분석한 피부 상태를 바탕으로 사용자에게 맞춤형 피부 관리 팁을 제공합니다. 예를 들어, 어떤 크림이나 제품이 적합할지 추천.
+AR(증강 현실) 기반 피부 진단: AR 기능을 통해 사용자가 자신의 얼굴을 카메라로 비추면 AI가 피부 상태를 실시간으로 진단하고 조언을 제공할 수 있습니다. (ARKit 또는 ARCore 사용)
 커뮤니티 기능: 사용자 간의 피부 질환 관리 경험을 공유할 수 있는 포럼이나 채팅 기능.
 상담 기능: 피부 전문가와의 1:1 상담 예약 및 진행.
 QR 코드 생성: 병원 방문 시 의사에게 빠르게 피부 상태를 공유할 수 있도록 QR 코드 생성 기능.
 
-3. 데이터베이스 설계
-- users : 사용자 테이블
-- photos : 사진 기록 테이블
-- questionnaire : 문진 기록 테이블
-- skin_conditions : 피부 질환 정보 테이블
-- skin_tracking : 피부 상태 추적 테이블
-- ai_analysis : AI 분석 기록 테이블
+3. DB 설계
+users: 사용자의 기본 정보를 저장하는 테이블입니다. uid로 사용자를 고유하게 식별합니다.
+images: 사용자가 업로드한 피부 사진에 대한 정보를 저장합니다. 각 이미지는 image_id로 고유 식별되며, diagnosis_result로 AI 분석 결과를 포함합니다.
+surveys: 사용자가 작성한 문진 기록을 저장합니다. 문진 데이터는 answers로 저장됩니다.
+recommendations: AI 분석을 통해 추천된 제품 정보를 저장합니다.
+community_posts: 사용자 게시물 및 댓글을 저장합니다. 게시물은 post_id로 식별됩니다.
+skin_conditions: 피부 질환의 정보 및 세부 사항을 저장합니다. condition_id로 각 질환을 식별합니다.
+tracking_logs: 사용자의 피부 상태 추적 기록을 저장합니다. 피부 사진 및 문진 결과를 포함합니다.
+ai_recommendations: AI 분석을 기반으로 추천된 스킨케어 팁과 제품 정보를 저장합니다.
+consultation_requests: 사용자가 피부 전문가와 상담을 요청하는 정보를 저장합니다. 상담 예약 정보가 포함됩니다.
+qr_codes: 사용자가 생성한 QR 코드 정보가 저장됩니다. 이를 통해 병원에서 피부 상태를 공유할 수 있습니다.
+ai_analysis_results: AI 모델이 분석한 피부 질환 결과를 저장합니다. 이 테이블은 image_id와 연결되어 피부 상태를 분석한 결과를 제공합니다. 분석 결과에는 confidence_score와 ai_model_version도 포함됩니다.
+ai_skin_conditions: AI 분석 결과에 따라 정의된 피부 질환 정보를 저장합니다. AI 모델이 분석한 결과에 대한 신뢰도를 confidence_score로 제공하며, AI 분석을 통해 추천된 치료법도 포함됩니다. 테이블과 연결됩니다.
 
-users (1) : photos (n)
-users (1) : questionnaire (n)
-users (1) : skin_tracking (n)
-photos (1) : ai_analysis (n)
-skin_conditions (1) : skin_tracking (n)
-
-+------------------+        +------------------+        +-----------------------+
-|     users       |        |      photos      |        |     questionnaire     |
-+------------------+        +------------------+        +-----------------------+
-| user_id (PK)    |<----+  | photo_id (PK)    |        | questionnaire_id (PK) |
-| email           |     |  | user_id (FK)     |        | user_id (FK)          |
-| password        |     |  | photo_url        |        | symptoms              |
-| name            |     |  | ai_result        |        | lifestyle             |
-| phone_number    |     |  | created_at       |        | created_at            |
-| created_at      |     |  +------------------+        +-----------------------+
-| updated_at      |     |      
-+------------------+     |
-                         |
-                       +----------------------+
-                       |   skin_conditions    |
-                       +----------------------+
-                       | condition_id (PK)    |
-                       | name                 |
-                       | description          |
-                       | treatment_suggestions|
-                       +----------------------+
-                                |
-                                |
-                       +----------------------+
-                       |    skin_tracking     |
-                       +----------------------+
-                       | tracking_id (PK)     |
-                       | user_id (FK)         |
-                       | photo_id (FK)        |
-                       | condition_id (FK)    |
-                       | created_at           |
-                       +----------------------+
-                                |
-                       +----------------------+
-                       |    ai_analysis       |
-                       +----------------------+
-                       | analysis_id (PK)     |
-                       | photo_id (FK)        |
-                       | result               |
-                       | confidence_level     |
-                       | created_at           |
-                       +----------------------+
-
---사용자 테이블 (users)
-CREATE TABLE users (
-    user_id INT PRIMARY KEY IDENTITY(1,1),
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    name VARCHAR(100),
-    phone_number VARCHAR(15),
-    created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME DEFAULT GETDATE()
-);
-
-INSERT INTO users (email, password, name, phone_number)
-VALUES ('user1@example.com', 'hashedpassword123', '홍길동', '01012345678');
-
---사진 기록 테이블 (photos)
-CREATE TABLE photos (
-    photo_id INT PRIMARY KEY IDENTITY(1,1),
-    user_id INT,
-    photo_url VARCHAR(255),
-    ai_result VARCHAR(255),
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-);
-
-INSERT INTO photos (user_id, photo_url, ai_result)
-VALUES (1, 'https://example.com/photo1.jpg', '여드름');
-
---문진 기록 테이블 (questionnaire)
-CREATE TABLE questionnaire (
-    questionnaire_id INT PRIMARY KEY IDENTITY(1,1),
-    user_id INT,
-    symptoms VARCHAR(500),
-    lifestyle VARCHAR(500),
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-);
-
-INSERT INTO questionnaire (user_id, symptoms, lifestyle)
-VALUES (1, '피부에 붉은 발진이 나타나고 간지러움', '피부에 자극이 되는 화장품 사용');
-
---피부 질환 정보 테이블 (skin_conditions)
-CREATE TABLE skin_conditions (
-    condition_id INT PRIMARY KEY IDENTITY(1,1),
-    name VARCHAR(255),
-    description TEXT,
-    treatment_suggestions TEXT
-);
-
-INSERT INTO skin_conditions (name, description, treatment_suggestions)
-VALUES 
-('여드름', '여드름은 피부의 모공이 막히고 염증이 발생하는 상태입니다. 주로 얼굴, 가슴, 등 부위에 나타납니다.',
- '피부를 청결하게 유지하고, 과도한 유분을 제거하는 제품 사용을 권장합니다. 또한, 항균제나 레티노이드 제품 사용을 고려할 수 있습니다.'),
-
-('아토피 피부염', '아토피 피부염은 피부에 염증과 가려움증을 동반하는 만성적인 피부 질환입니다.',
- '보습제를 자주 바르고, 자극적인 화장품 사용을 피해야 합니다. 증상이 심할 경우, 의사의 처방에 따라 스테로이드제나 면역조절제를 사용합니다.'),
-
-('건선', '건선은 피부가 빨갛고 비늘 모양으로 부풀어오르는 만성적인 피부 질환입니다.',
- '보습제를 사용하고, 햇볕을 적당히 쬐며, 의사 처방에 따라 비타민 D 유도체나 스테로이드제를 사용할 수 있습니다.'),
-
-('습진', '습진은 피부가 가려운 붉은 반점이나 수포가 생기는 염증성 피부 질환입니다.',
- '피부를 건조하게 만들지 않도록 보습을 꾸준히 하고, 자극을 줄이는 피부 제품을 사용하는 것이 중요합니다.'),
-
-('피지낭종', '피지낭종은 피부에 발생하는 비정상적인 피지 선 덩어리입니다.',
- '대부분은 치료가 필요하지 않지만, 염증이 발생하거나 커질 경우 수술적 제거가 필요할 수 있습니다.');
-
-
---피부 상태 추적 테이블 (skin_tracking)
-CREATE TABLE skin_tracking (
-    tracking_id INT PRIMARY KEY IDENTITY(1,1),
-    user_id INT,
-    photo_id INT,
-    condition_id INT,
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (photo_id) REFERENCES photos(photo_id),
-    FOREIGN KEY (condition_id) REFERENCES skin_conditions(condition_id)
-);
-
-INSERT INTO skin_tracking (user_id, photo_id, condition_id, created_at)
-VALUES 
-(1, 101, 1, '2025-03-01 10:00:00'),
-(1, 102, 2, '2025-03-02 11:30:00'),
-(2, 103, 3, '2025-03-02 12:00:00'),
-(2, 104, 4, '2025-03-03 14:00:00'),
-(3, 105, 5, '2025-03-04 09:30:00'),
-(3, 106, 1, '2025-03-04 10:30:00'),
-(4, 107, 2, '2025-03-05 15:00:00'),
-(4, 108, 3, '2025-03-06 16:00:00');
-
---AI 분석 기록 테이블 (ai_analysis)
-CREATE TABLE ai_analysis (
-    analysis_id INT PRIMARY KEY IDENTITY(1,1),
-    photo_id INT,
-    result VARCHAR(255),
-    confidence_level FLOAT,
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (photo_id) REFERENCES photos(photo_id)
-);
-
-INSERT INTO ai_analysis (photo_id, result, confidence_level, created_at)
-VALUES 
-(101, '여드름', 0.92, '2025-03-01 10:05:00'),
-(102, '아토피 피부염', 0.87, '2025-03-02 11:35:00'),
-(103, '건선', 0.85, '2025-03-02 12:05:00'),
-(104, '습진', 0.90, '2025-03-03 14:05:00'),
-(105, '피지낭종', 0.95, '2025-03-04 09:35:00'),
-(106, '여드름', 0.88, '2025-03-04 10:35:00'),
-(107, '아토피 피부염', 0.91, '2025-03-05 15:05:00'),
-(108, '건선', 0.89, '2025-03-06 16:05:00');
-
-4. 개발도구설치
-1) Node.js & npm (Node Package Manager)
++---------------------+       +-------------------+       +---------------------+
+|      users          |       |      images       |       |     surveys         |
++---------------------+       +-------------------+       +---------------------+
+| - uid: string       |       | - image_id: string|       | - survey_id: string  |
+| - email: string     |<----->| - user_id: string |<----->| - user_id: string    |
+| - profile_picture: string | | - image_url: string|       | - answers: object    |
+| - skin_type: string |       | - diagnosis_result: string | | - created_at: datetime |
+| - created_at: datetime |   | - upload_date: datetime |   | - created_at: datetime |
+| - last_login: datetime |   | - tags: array      |       +---------------------+
++---------------------+       +-------------------+               
+         |                           |
+         |                           |
+         |                           v
+         |                 +--------------------+
+         |                 | recommendations     |
+         |                 +--------------------+
+         |                 | - recommendation_id: string |
+         |                 | - user_id: string    |
+         |                 | - product_name: string|
+         |                 | - recommendation_reason: string |
+         |                 | - product_url: string  |
+         |                 +--------------------+   
+         |
+         v
++--------------------+       +--------------------+
+|   community_posts  |       |  skin_conditions   |
++--------------------+       +--------------------+
+| - post_id: string  |       | - condition_id: string |
+| - user_id: string  |       | - condition_name: string |
+| - title: string    |       | - condition_description: string |
+| - content: string  |       | - symptoms: array   |
+| - created_at: datetime |   | - treatment: array   |
+| - comments: array  |       | - risk_factors: array|
+| - likes: integer    |       | - image_url: string |
++--------------------+       | - created_at: datetime |
+                             +--------------------+
+                                         |
+                                         v
+                             +--------------------+
+                             | tracking_logs      |
+                             +--------------------+
+                             | - log_id: string    |
+                             | - user_id: string   |
+                             | - image_url: string |
+                             | - survey_data: object |
+                             | - log_date: datetime|
+                             +--------------------+
+                                         |
+                                         v
+                             +--------------------+
+                             | ai_recommendations |
+                             +--------------------+
+                             | - recommendation_id: string |
+                             | - user_id: string   |
+                             | - ai_analysis_result: string |
+                             | - tips: array        |
+                             | - product_recommendations: array |
+                             +--------------------+
+                                         |
+                                         v
+                             +--------------------+
+                             | consultation_requests |
+                             +--------------------+
+                             | - request_id: string |
+                             | - user_id: string    |
+                             | - consultation_date: datetime |
+                             | - status: string      |
+                             | - consultation_type: string |
+                             +--------------------+
+                                         |
+                                         v
+                             +--------------------+
+                             | qr_codes           |
+                             +--------------------+
+                             | - qr_code_id: string |
+                             | - user_id: string    |
+                             | - qr_code_url: string|
+                             | - generated_at: datetime |
+                             +--------------------+
+                                         |
+                                         v
+                             +--------------------+
+                             | ai_analysis_results |
+                             +--------------------+
+                             | - result_id: string |
+                             | - image_id: string  |
+                             | - diagnosis_result: string |
+                             | - confidence_score: float |
+                             | - analysis_timestamp: datetime |
+                             | - ai_model_version: string |
+                             +--------------------+
+                                         |
+                                         v
+                             +--------------------+
+                             | ai_skin_conditions  |
+                             +--------------------+
+                             | - condition_id: string |
+                             | - ai_analysis_result: string |
+                             | - confidence_score: float |
+                             | - condition_description: string |
+                             | - recommendations: array   |
+                             +--------------------+
 
 
 
+1) users 컬렉션
+사용자 정보를 저장합니다. Firebase Authentication을 통해 사용자를 인증하고, 이를 기반으로 Firebase Firestore에 사용자 정보를 저장합니다.
+{
+  "users": {
+    "uid": "user123",  // Firebase Authentication에서 제공되는 고유 ID
+    "email": "user@example.com",
+    "profile_picture": "https://example.com/profile_pic.jpg",
+    "skin_type": "지성",  // 예: 건성, 지성, 복합성 등
+    "created_at": "2025-03-14T10:00:00Z",
+    "last_login": "2025-03-15T10:00:00Z"
+  }
+}
+2) images 컬렉션
+사용자가 업로드한 이미지를 저장합니다. 각 이미지에 대한 분석 결과와 함께 저장됩니다.
+{
+  "images": {
+    "image_id": "image123",
+    "user_id": "user123",  // Firebase Authentication uid
+    "image_url": "https://example.com/uploaded_image.jpg",
+    "diagnosis_result": "여드름",  // AI 분석 결과
+    "upload_date": "2025-03-14T12:00:00Z",
+    "tags": ["여드름", "모공"]
+  }
+}
+3) surveys 컬렉션
+사용자가 작성한 문진 기록을 저장합니다. 문진 항목과 답변을 JSON 객체 형태로 저장할 수 있습니다.
+{
+  "surveys": {
+    "survey_id": "survey123",
+    "user_id": "user123",
+    "answers": {
+      "symptoms": "붉은 발진",
+      "onset_time": "2주 전",
+      "lifestyle": "스트레스, 흡연",
+      "treatment": "약물 치료"
+    },
+    "created_at": "2025-03-14T12:30:00Z"
+  }
+}
+4) recommendations 컬렉션
+AI 기반으로 추천된 제품 정보를 저장합니다.
+{
+  "recommendations": {
+    "recommendation_id": "rec123",
+    "user_id": "user123",
+    "product_name": "피부 진정 크림",
+    "recommendation_reason": "여드름 완화 효과",
+    "product_url": "https://example.com/product123"
+  }
+}
+5) community_posts 컬렉션
+사용자가 작성한 게시물과 관련된 정보를 저장합니다. 다른 사용자들이 댓글을 달거나 좋아요를 할 수 있습니다.
+{
+  "community_posts": {
+    "post_id": "post123",
+    "user_id": "user123",
+    "title": "여드름 치료 후 변화",
+    "content": "여드름 치료 후 피부가 많이 좋아졌어요. 추천합니다!",
+    "created_at": "2025-03-14T13:00:00Z",
+    "comments": [
+      {
+        "comment_id": "comment123",
+        "user_id": "user456",
+        "content": "좋은 정보 감사합니다!"
+      }
+    ],
+    "likes": 5
+  }
+}
+6) skin_conditions 컬렉션
+피부 질환에 대한 정보를 저장합니다. AI 분석 결과와 연결될 수 있습니다.
+{
+  "skin_conditions": {
+    "condition_id": "condition123",
+    "condition_name": "여드름",
+    "condition_description": "여드름은 피부 모공이 막히고 염증이 생겨 발생하는 피부 질환입니다.",
+    "symptoms": ["붉은 발진", "흉터", "피부에 농포 형성"],
+    "treatment": ["항생제 사용", "여드름 치료 크림", "피부과 치료"],
+    "risk_factors": ["호르몬 변화", "스트레스", "지성 피부"],
+    "image_url": "https://example.com/acne_image.jpg",
+    "created_at": "2025-03-14T10:00:00Z",
+    "updated_at": "2025-03-14T10:00:00Z"
+  }
+}
+7) tracking_logs 컬렉션
+사용자가 일주일 또는 한 달 단위로 피부 상태 변화를 기록할 수 있도록 관리합니다. 이를 통해 사용자는 변화된 피부 상태를 시각적으로 확인할 수 있습니다.
+{
+  "tracking_logs": {
+    "log_id": "log123",
+    "user_id": "user123",
+    "image_url": "https://example.com/tracking_image.jpg",
+    "survey_data": {
+      "symptoms": "붉은 발진",
+      "condition_severity": "경미"
+    },
+    "log_date": "2025-03-14T15:00:00Z"
+  }
+}
+8) AI Recommendations 컬렉션
+AI 분석에 기반하여 추천되는 피부 관리 팁이나 제품을 저장합니다.
+{
+  "ai_recommendations": {
+    "recommendation_id": "ai_rec123",
+    "user_id": "user123",
+    "ai_analysis_result": "여드름",
+    "tips": ["여드름 치료 크림 사용", "매일 세안 후 보습제 사용"],
+    "product_recommendations": [
+      {
+        "product_name": "피부 진정 크림",
+        "reason": "여드름 완화"
+      }
+    ]
+  }
+}
+9) consultation_requests 컬렉션
+피부 전문가와의 1:1 상담 예약을 관리합니다.
+{
+  "consultation_requests": {
+    "request_id": "request123",
+    "user_id": "user123",
+    "consultation_date": "2025-03-20T10:00:00Z",
+    "status": "예약됨",  // 상태: 예약됨, 진행 중, 완료 등
+    "consultation_type": "1:1 상담"
+  }
+}
+10) qr_codes 컬렉션
+병원 방문 시 피부 상태를 공유할 수 있도록 QR 코드를 생성합니다.
+{
+  "qr_codes": {
+    "qr_code_id": "qr123",
+    "user_id": "user123",
+    "qr_code_url": "https://example.com/qr_code_image.jpg",
+    "generated_at": "2025-03-14T15:30:00Z"
+  }
+}
 
+11) ai_analysis_results
+AI 모델이 분석한 피부 질환 결과를 저장합니다. 이 테이블은 image_id와 연결되어 피부 상태를 분석한 결과를 제공합니다. 분석 결과에는 confidence_score와 ai_model_version도 포함됩니다.
+{
+  "ai_analysis_results": {
+    "result_id": "string",
+    "image_id": "string",
+    "diagnosis_result": "string",
+    "confidence_score": "float",
+    "analysis_timestamp": "datetime",
+    "ai_model_version": "string"
+  },
 
+12) ai_skin_conditions: AI 분석 결과에 따라 정의된 피부 질환 정보를 저장합니다. AI 모델이 분석한 결과에 대한 신뢰도를 confidence_score로 제공하며, AI 분석을 통해 추천된 치료법도 포함됩니다. 테이블과 연결됩니다.
+  "ai_skin_conditions": {
+    "condition_id": "string",
+    "ai_analysis_result": "string",
+    "confidence_score": "float",
+    "condition_description": "string",
+    "recommendations": "array"
+  }
+}
 
+13) Firebase Firestore 규칙 설정
+Firebase에서 보안을 설정할 때 Firestore 보안 규칙을 정의해야 합니다. 예를 들어, 각 사용자는 자신의 데이터만 읽고 쓸 수 있도록 설정할 수 있습니다.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // users 컬렉션
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // images 컬렉션
+    match /images/{imageId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.user_id;
+    }
+    
+    // 다른 컬렉션에 대해서도 비슷한 규칙을 추가합니다.
+  }
+}
 
+4. 데이터 적재
+1) users
+{
+  "users": [
+    {
+      "uid": "user123",
+      "email": "user123@example.com",
+      "profile_picture": "https://example.com/profile123.jpg",
+      "skin_type": "지성",
+      "created_at": "2025-03-14T10:00:00Z",
+      "last_login": "2025-03-15T10:00:00Z"
+    },
+    {
+      "uid": "user124",
+      "email": "user124@example.com",
+      "profile_picture": "https://example.com/profile124.jpg",
+      "skin_type": "건성",
+      "created_at": "2025-03-14T10:10:00Z",
+      "last_login": "2025-03-15T11:00:00Z"
+    },
+    {
+      "uid": "user125",
+      "email": "user125@example.com",
+      "profile_picture": "https://example.com/profile125.jpg",
+      "skin_type": "복합성",
+      "created_at": "2025-03-14T10:20:00Z",
+      "last_login": "2025-03-15T12:00:00Z"
+    },
+    {
+      "uid": "user126",
+      "email": "user126@example.com",
+      "profile_picture": "https://example.com/profile126.jpg",
+      "skin_type": "민감성",
+      "created_at": "2025-03-14T10:30:00Z",
+      "last_login": "2025-03-15T13:00:00Z"
+    },
+    {
+      "uid": "user127",
+      "email": "user127@example.com",
+      "profile_picture": "https://example.com/profile127.jpg",
+      "skin_type": "지성",
+      "created_at": "2025-03-14T10:40:00Z",
+      "last_login": "2025-03-15T14:00:00Z"
+    }
+  ]
+}
+2) images
+{
+  "images": [
+    {
+      "image_id": "image123",
+      "user_id": "user123",
+      "image_url": "https://example.com/image123.jpg",
+      "diagnosis_result": "여드름",
+      "upload_date": "2025-03-14T12:00:00Z",
+      "tags": ["여드름", "모공"]
+    },
+    {
+      "image_id": "image124",
+      "user_id": "user124",
+      "image_url": "https://example.com/image124.jpg",
+      "diagnosis_result": "아토피",
+      "upload_date": "2025-03-14T13:00:00Z",
+      "tags": ["아토피", "가려움증"]
+    },
+    {
+      "image_id": "image125",
+      "user_id": "user125",
+      "image_url": "https://example.com/image125.jpg",
+      "diagnosis_result": "습진",
+      "upload_date": "2025-03-14T14:00:00Z",
+      "tags": ["습진", "피부 건조"]
+    },
+    {
+      "image_id": "image126",
+      "user_id": "user126",
+      "image_url": "https://example.com/image126.jpg",
+      "diagnosis_result": "모공",
+      "upload_date": "2025-03-14T15:00:00Z",
+      "tags": ["모공", "피지"]
+    },
+    {
+      "image_id": "image127",
+      "user_id": "user127",
+      "image_url": "https://example.com/image127.jpg",
+      "diagnosis_result": "홍반",
+      "upload_date": "2025-03-14T16:00:00Z",
+      "tags": ["홍반", "피부 염증"]
+    }
+  ]
+}
+3) surveys 
+{
+  "surveys": [
+    {
+      "survey_id": "survey123",
+      "user_id": "user123",
+      "answers": {
+        "symptoms": "붉은 발진",
+        "onset_time": "2주 전",
+        "lifestyle": "스트레스, 흡연",
+        "treatment": "약물 치료"
+      },
+      "created_at": "2025-03-14T12:30:00Z"
+    },
+    {
+      "survey_id": "survey124",
+      "user_id": "user124",
+      "answers": {
+        "symptoms": "피부 건조",
+        "onset_time": "1개월 전",
+        "lifestyle": "과도한 세안",
+        "treatment": "보습제 사용"
+      },
+      "created_at": "2025-03-14T13:30:00Z"
+    },
+    {
+      "survey_id": "survey125",
+      "user_id": "user125",
+      "answers": {
+        "symptoms": "가려움증",
+        "onset_time": "3일 전",
+        "lifestyle": "알레르기",
+        "treatment": "항히스타민제"
+      },
+      "created_at": "2025-03-14T14:30:00Z"
+    },
+    {
+      "survey_id": "survey126",
+      "user_id": "user126",
+      "answers": {
+        "symptoms": "피부 자극",
+        "onset_time": "5일 전",
+        "lifestyle": "과도한 자외선 노출",
+        "treatment": "자외선 차단제"
+      },
+      "created_at": "2025-03-14T15:30:00Z"
+    },
+    {
+      "survey_id": "survey127",
+      "user_id": "user127",
+      "answers": {
+        "symptoms": "발진",
+        "onset_time": "2주 전",
+        "lifestyle": "스트레스",
+        "treatment": "스트레스 관리"
+      },
+      "created_at": "2025-03-14T16:30:00Z"
+    }
+  ]
+}
+4) recommendations 
+{
+  "recommendations": [
+    {
+      "recommendation_id": "rec123",
+      "user_id": "user123",
+      "product_name": "피부 진정 크림",
+      "recommendation_reason": "여드름 완화 효과",
+      "product_url": "https://example.com/product123"
+    },
+    {
+      "recommendation_id": "rec124",
+      "user_id": "user124",
+      "product_name": "보습 세럼",
+      "recommendation_reason": "피부 건조 예방",
+      "product_url": "https://example.com/product124"
+    },
+    {
+      "recommendation_id": "rec125",
+      "user_id": "user125",
+      "product_name": "알레르기 완화 크림",
+      "recommendation_reason": "가려움증 완화",
+      "product_url": "https://example.com/product125"
+    },
+    {
+      "recommendation_id": "rec126",
+      "user_id": "user126",
+      "product_name": "자외선 차단제",
+      "recommendation_reason": "자외선 차단",
+      "product_url": "https://example.com/product126"
+    },
+    {
+      "recommendation_id": "rec127",
+      "user_id": "user127",
+      "product_name": "피부 회복 크림",
+      "recommendation_reason": "피부 회복 촉진",
+      "product_url": "https://example.com/product127"
+    }
+  ]
+}
+5) community_posts 
+{
+  "community_posts": [
+    {
+      "post_id": "post123",
+      "user_id": "user123",
+      "title": "여드름 치료 후 변화",
+      "content": "여드름 치료 후 피부가 많이 좋아졌어요. 추천합니다!",
+      "created_at": "2025-03-14T13:00:00Z",
+      "comments": [
+        {
+          "comment_id": "comment123",
+          "user_id": "user456",
+          "content": "좋은 정보 감사합니다!"
+        }
+      ],
+      "likes": 5
+    },
+    {
+      "post_id": "post124",
+      "user_id": "user124",
+      "title": "피부 건조 예방 방법",
+      "content": "피부 건조를 예방하려면 꾸준히 보습제를 사용해야 합니다.",
+      "created_at": "2025-03-14T13:30:00Z",
+      "comments": [],
+      "likes": 3
+    },
+    {
+      "post_id": "post125",
+      "user_id": "user125",
+      "title": "습진 치료 경험",
+      "content": "습진 치료를 통해 많이 호전되었습니다.",
+      "created_at": "2025-03-14T14:00:00Z",
+      "comments": [],
+      "likes": 2
+    },
+    {
+      "post_id": "post126",
+      "user_id": "user126",
+      "title": "자외선 차단의 중요성",
+      "content": "자외선 차단제를 매일 사용하는 것이 중요합니다.",
+      "created_at": "2025-03-14T14:30:00Z",
+      "comments": [],
+      "likes": 10
+    },
+    {
+      "post_id": "post127",
+      "user_id": "user127",
+      "title": "스트레스와 피부 건강",
+      "content": "스트레스가 피부에 미치는 영향이 큽니다. 관리가 필요합니다.",
+      "created_at": "2025-03-14T15:00:00Z",
+      "comments": [],
+      "likes": 7
+    }
+  ]
+}
+6) skin_conditions 
+{
+  "skin_conditions": {
+    "condition_id": "condition123",
+    "condition_name": "여드름",
+    "condition_description": "여드름은 피부 모공이 막히고 염증이 생겨 발생하는 피부 질환입니다.",
+    "symptoms": ["붉은 발진", "흉터", "피부에 농포 형성"],
+    "treatment": ["항생제 사용", "여드름 치료 크림", "피부과 치료"],
+    "risk_factors": ["호르몬 변화", "스트레스", "지성 피부"],
+    "image_url": "https://example.com/acne_image.jpg",
+    "created_at": "2025-03-14T10:00:00Z",
+    "updated_at": "2025-03-14T10:00:00Z"
+  }
+}
+{
+  "skin_conditions": {
+    "condition_id": "condition124",
+    "condition_name": "건선",
+    "condition_description": "건선은 피부 세포가 빠르게 증가하여 두껍고 비늘 모양의 피부를 만드는 만성 피부 질환입니다.",
+    "symptoms": ["붉은 발진", "비늘", "피부 건조"],
+    "treatment": ["항염증 크림", "UV 치료", "면역 억제제"],
+    "risk_factors": ["유전", "스트레스", "흡연"],
+    "image_url": "https://example.com/psoriasis_image.jpg",
+    "created_at": "2025-03-14T10:00:00Z",
+    "updated_at": "2025-03-14T10:00:00Z"
+  }
+}
+{
+  "skin_conditions": {
+    "condition_id": "condition125",
+    "condition_name": "아토피 피부염",
+    "condition_description": "아토피 피부염은 피부가 건조하고 가렵고 염증이 발생하는 알레르기성 피부 질환입니다.",
+    "symptoms": ["가려움", "발진", "건조함"],
+    "treatment": ["보습제 사용", "항히스타민제", "스테로이드제"],
+    "risk_factors": ["유전", "알레르기", "환경적 요인"],
+    "image_url": "https://example.com/eczema_image.jpg",
+    "created_at": "2025-03-14T10:00:00Z",
+    "updated_at": "2025-03-14T10:00:00Z"
+  }
+}
+{
+  "skin_conditions": {
+    "condition_id": "condition126",
+    "condition_name": "피지선 과다",
+    "condition_description": "피지선 과다는 피부에 과도한 피지가 생성되어 여드름, 번들거림 등을 유발하는 상태입니다.",
+    "symptoms": ["피지 과다", "여드름 발생", "피부 번들거림"],
+    "treatment": ["지성 피부용 세안제", "피지 조절 크림", "클렌징"],
+    "risk_factors": ["지성 피부", "호르몬 변화", "스트레스"],
+    "image_url": "https://example.com/excess_sebum_image.jpg",
+    "created_at": "2025-03-14T10:00:00Z",
+    "updated_at": "2025-03-14T10:00:00Z"
+  }
+}
+{
+  "skin_conditions": {
+    "condition_id": "condition127",
+    "condition_name": "탈모",
+    "condition_description": "탈모는 모발이 빠지고 재생되지 않는 상태로, 남성형 탈모와 여성형 탈모가 있습니다.",
+    "symptoms": ["머리카락 빠짐", "모발이 얇아짐", "두피가 보임"],
+    "treatment": ["모발 이식", "탈모 치료제", "영양제"],
+    "risk_factors": ["유전", "호르몬 변화", "스트레스"],
+    "image_url": "https://example.com/hair_loss_image.jpg",
+    "created_at": "2025-03-14T10:00:00Z",
+    "updated_at": "2025-03-14T10:00:00Z"
+  }
+}
+7) tracking_logs 
+{
+  "tracking_logs": {
+    "log_id": "log123",
+    "user_id": "user123",
+    "image_url": "https://example.com/tracking_image1.jpg",
+    "survey_data": {
+      "symptoms": "붉은 발진",
+      "condition_severity": "경미"
+    },
+    "log_date": "2025-03-14T15:00:00Z"
+  }
+}
+{
+  "tracking_logs": {
+    "log_id": "log124",
+    "user_id": "user124",
+    "image_url": "https://example.com/tracking_image2.jpg",
+    "survey_data": {
+      "symptoms": "피부 건조",
+      "condition_severity": "심각"
+    },
+    "log_date": "2025-03-15T15:00:00Z"
+  }
+}
+{
+  "tracking_logs": {
+    "log_id": "log125",
+    "user_id": "user125",
+    "image_url": "https://example.com/tracking_image3.jpg",
+    "survey_data": {
+      "symptoms": "여드름",
+      "condition_severity": "보통"
+    },
+    "log_date": "2025-03-16T15:00:00Z"
+  }
+}
+{
+  "tracking_logs": {
+    "log_id": "log126",
+    "user_id": "user126",
+    "image_url": "https://example.com/tracking_image4.jpg",
+    "survey_data": {
+      "symptoms": "붉은 발진",
+      "condition_severity": "경미"
+    },
+    "log_date": "2025-03-17T15:00:00Z"
+  }
+}
+{
+  "tracking_logs": {
+    "log_id": "log127",
+    "user_id": "user127",
+    "image_url": "https://example.com/tracking_image5.jpg",
+    "survey_data": {
+      "symptoms": "피지 과다",
+      "condition_severity": "보통"
+    },
+    "log_date": "2025-03-18T15:00:00Z"
+  }
+}
+8) ai_recommendations
+{
+  "ai_recommendations": {
+    "recommendation_id": "ai_rec123",
+    "user_id": "user123",
+    "ai_analysis_result": "여드름",
+    "tips": ["여드름 치료 크림 사용", "매일 세안 후 보습제 사용"],
+    "product_recommendations": [
+      {
+        "product_name": "피부 진정 크림",
+        "reason": "여드름 완화"
+      }
+    ]
+  }
+}
+{
+  "ai_recommendations": {
+    "recommendation_id": "ai_rec124",
+    "user_id": "user124",
+    "ai_analysis_result": "피부 건조",
+    "tips": ["보습제 사용", "샤워 후 피부 보호"],
+    "product_recommendations": [
+      {
+        "product_name": "고보습 크림",
+        "reason": "피부 건조 완화"
+      }
+    ]
+  }
+}
+{
+  "ai_recommendations": {
+    "recommendation_id": "ai_rec125",
+    "user_id": "user125",
+    "ai_analysis_result": "아토피 피부염",
+    "tips": ["저자극성 세안제 사용", "피부 보습제 바르기"],
+    "product_recommendations": [
+      {
+        "product_name": "아토피 전용 크림",
+        "reason": "아토피 완화"
+      }
+    ]
+  }
+}
+{
+  "ai_recommendations": {
+    "recommendation_id": "ai_rec126",
+    "user_id": "user126",
+    "ai_analysis_result": "탈모",
+    "tips": ["탈모 방지 샴푸 사용", "두피 마사지"],
+    "product_recommendations": [
+      {
+        "product_name": "탈모 방지 샴푸",
+        "reason": "탈모 완화"
+      }
+    ]
+  }
+}
+{
+  "ai_recommendations": {
+    "recommendation_id": "ai_rec127",
+    "user_id": "user127",
+    "ai_analysis_result": "피지선 과다",
+    "tips": ["피지 조절 세안제 사용", "주기적인 각질 제거"],
+    "product_recommendations": [
+      {
+        "product_name": "피지 조절 크림",
+        "reason": "피지 조절"
+      }
+    ]
+  }
+}
+9) consultation_requests
+{
+  "consultation_requests": {
+    "request_id": "request123",
+    "user_id": "user123",
+    "consultation_date": "2025-03-20T10:00:00Z",
+    "status": "예약됨",
+    "consultation_type": "1:1 상담"
+  }
+}
+{
+  "consultation_requests": {
+    "request_id": "request124",
+    "user_id": "user124",
+    "consultation_date": "2025-03-21T11:00:00Z",
+    "status": "예약됨",
+    "consultation_type": "전화 상담"
+  }
+}
+{
+  "consultation_requests": {
+    "request_id": "request125",
+    "user_id": "user125",
+    "consultation_date": "2025-03-22T14:00:00Z",
+    "status": "진행 중",
+    "consultation_type": "1:1 상담"
+  }
+}
+{
+  "consultation_requests": {
+    "request_id": "request126",
+    "user_id": "user126",
+    "consultation_date": "2025-03-23T09:00:00Z",
+    "status": "완료",
+    "consultation_type": "1:1 상담"
+  }
+}
+{
+  "consultation_requests": {
+    "request_id": "request127",
+    "user_id": "user127",
+    "consultation_date": "2025-03-24T16:00:00Z",
+    "status": "예약됨",
+    "consultation_type": "온라인 상담"
+  }
+}
+10) medical_centers
+{
+  "medical_centers": {
+    "center_id": "center123",
+    "name": "서울 피부과",
+    "address": "서울특별시 강남구 테헤란로 123",
+    "contact": "02-1234-5678",
+    "specialties": ["피부 질환 치료", "여드름 치료", "탈모 치료"],
+    "image_url": "https://example.com/seoul_skin_clinic.jpg"
+  }
+}
+{
+  "medical_centers": {
+    "center_id": "center124",
+    "name": "부산 피부과",
+    "address": "부산광역시 해운대구 센텀중앙로 456",
+    "contact": "051-9876-5432",
+    "specialties": ["피부 치료", "아토피 치료", "피부 염증 치료"],
+    "image_url": "https://example.com/busan_skin_clinic.jpg"
+  }
+}
+{
+  "medical_centers": {
+    "center_id": "center125",
+    "name": "인천 피부과",
+    "address": "인천광역시 남동구 예술로 789",
+    "contact": "032-2345-6789",
+    "specialties": ["탈모 치료", "피부 미용", "여드름 치료"],
+    "image_url": "https://example.com/incheon_skin_clinic.jpg"
+  }
+}
+{
+  "medical_centers": {
+    "center_id": "center126",
+    "name": "대구 피부과",
+    "address": "대구광역시 수성구 동대구로 135",
+    "contact": "053-4567-8910",
+    "specialties": ["피부 질환 치료", "피부 수술", "피부 재생 치료"],
+    "image_url": "https://example.com/daegu_skin_clinic.jpg"
+  }
+}
+{
+  "medical_centers": {
+    "center_id": "center127",
+    "name": "광주 피부과",
+    "address": "광주광역시 북구 유림로 246",
+    "contact": "062-3456-7890",
+    "specialties": ["아토피 치료", "피부염 치료", "피부 재생 치료"],
+    "image_url": "https://example.com/gwangju_skin_clinic.jpg"
+  }
+}
 
-
-
-
-
-
-
-
-
-
+5. 개발도구설치
 
 
 
