@@ -4,7 +4,7 @@
 피부상태를 진단하고 추적하여 관리
 
 2. 개발도구 
-React, Firebase
+React(웹), React Native(모바일 웹), Firebase, TensorFlow.js 
 
 2. 설계
 1) 로그인
@@ -883,7 +883,295 @@ service cloud.firestore {
 }
 
 5. 개발도구설치
+1) React Native
+크로스 플랫폼(안드로이드, iOS) 모바일 앱을 개발하는 데 사용
+- Expo CLI 설치
+React Native 프로젝트를 빠르게 시작할 수 있는 프레임워크
+기본적인 설정이 되어 있어 빠르게 앱을 개발할 수 있음 
+npm install -g expo-cli
+expo --version
+C:\Windows\System32>expo --version
+WARNING: The legacy expo-cli does not support Node +17. Migrate to the new local Expo CLI: https://blog.expo.dev/the-new-expo-cli-f4250d8e3421.
+6.3.12
+- React Native 프로젝트 생성
+expo init skin-care-app
+blank (선택)
+Migrate to using:
+› npx create-expo-app --template
+
+√ Choose a template: » blank               a minimal app as clean as an empty canvas
+√ Downloaded template.
+Using npm to install packages.
+√ Installed JavaScript dependencies.
+
+Your project is ready!
+
+To run your project, navigate to the directory and run one of the following npm commands.
+
+- cd skin-care-app
+- npm start # you can open iOS, Android, or web from here, or run them directly with the commands below.
+- npm run android
+- npm run ios # requires an iOS device or macOS for access to an iOS simulator
+- npm run web
+Expo는 자동으로 웹 브라우저에서 QR 코드를 제공하며, 이를 통해 모바일에서 앱을 테스트할 수 있음 
+
+- react와 react-native 버전을 확인
+c:\ReactProject>npm list react react-native
+ReactProject@ c:\ReactProject
+└─┬ react-query@3.39.3
+  └── react@18.3.1
+
+2) Firebase
+Firebase 콘솔(https://console.firebase.google.com/)에 접속하여 새 프로젝트를 생성 
+-> nayoungkim0920
+Firebase Authentication을 활성화하고 필요한 로그인 방법(이메일, 구글, 카카오 등)을 설정 
+-> 이메일/비밀번호
+Firebase SDK 설치
+npm install --save firebase
+c:\ReactProject>npm install --save firebase
+
+added 86 packages in 21s
+
+3 packages are looking for funding
+  run `npm fund` for details
+
+3) TensorFlow.js (AI 모델)
+TensorFlow.js를 사용하여 피부 질환을 분류하는 AI 모델을 구현
+- TnesorFlow.js 설치
+c:\ReactProject>npm install @tensorflow/tfjs
+
+added 50 packages, and audited 137 packages in 10s
+
+10 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+c:\ReactProject>npm install @tensorflow-models/mobilenet
+
+added 1 package, and audited 138 packages in 3s
+
+10 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+- 설치확인
+c:\ReactProject>npm list @tensorflow/tfjs
+ReactProject@ c:\ReactProject
+└── @tensorflow/tfjs@4.22.0
+
+c:\ReactProject>npm list @tensorflow-models/mobilenet
+ReactProject@ c:\ReactProject
+└── @tensorflow-models/mobilenet@2.1.1
+
+4) React Query (API 연동 및 상태 관리)
+React Query를 사용하여 서버에서 데이터를 fetch하고 상태를 관리
+- React Query 설치
+c:\ReactProject>npm install react-query axios
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+
+added 31 packages, and audited 169 packages in 3s
+
+14 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+- rimraf, glob 경고 => 업그레이드 
+npm i rimraf@latest glob@latest
+
+- 설치확인
+c:\ReactProject>npm list react-query
+ReactProject@ c:\ReactProject
+└── react-query@3.39.3
+
+5) React Native Image Picker (이미지 업로드 및 촬영)
+사용자가 카메라로 이미지를 촬영하거나 갤러리에서 이미지를 선택할 수 있도록 함 
+- React Native Image Picker 설치
+- npm 7 이상에서는 peer dependency 충돌로 인해 설치가 실패
+c:\ReactProject>npm install react-native-image-picker --legacy-peer-deps
+
+added 1 package, removed 3 packages, and audited 196 packages in 755ms
+
+26 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+- 설치확인
+c:\ReactProject>npm list react-native-image-picker
+ReactProject@ c:\ReactProject
+└── react-native-image-picker@8.2.0
+
+6) Figma 디자인 적용 (UI/UX 디자인)
+최신 UI 디자인 트렌드를 Figma로 디자인하고 React Native에 반영
+- Figma 디자인
+c:\ReactProject>npm install react-native-paper react-navigation
+npm error code ERESOLVE
+npm error ERESOLVE could not resolve
+npm error
+npm error While resolving: undefined@undefined
+npm error Found: react@18.3.1
+npm error node_modules/react
+npm error   peer react@"^16.8.0 || ^17.0.0 || ^18.0.0" from react-query@3.39.3
+npm error   node_modules/react-query
+npm error     react-query@"^3.39.3" from the root project
+npm error
+npm error Could not resolve dependency:
+npm error react-native-paper@"*" from the root project
+npm error
+npm error Conflicting peer dependency: react@19.0.0
+npm error node_modules/react
+npm error   peer react@"^19.0.0" from react-native@0.78.0
+npm error   node_modules/react-native
+npm error     peer react-native@"*" from react-native-paper@5.13.1
+npm error     node_modules/react-native-paper
+npm error       react-native-paper@"*" from the root project
+npm error     peer react-native@"*" from react-native-safe-area-context@5.3.0
+npm error     node_modules/react-native-safe-area-context
+npm error       peer react-native-safe-area-context@"*" from react-native-paper@5.13.1
+npm error       node_modules/react-native-paper
+npm error         react-native-paper@"*" from the root project
+npm error
+npm error Fix the upstream dependency conflict, or retry
+npm error this command with --force or --legacy-peer-deps
+npm error to accept an incorrect (and potentially broken) dependency resolution.
+npm error
+npm error
+npm error For a full report see:
+npm error C:\Users\nayou\AppData\Local\npm-cache\_logs\2025-03-14T07_00_34_243Z-eresolve-report.txt
+npm error A complete log of this run can be found in: C:\Users\nayou\AppData\Local\npm-cache\_logs\2025-03-14T07_00_34_243Z-debug-0.log
+
+7) Web 서비스 제공(React.js + Next.js)
+웹 서비스에서 모바일 앱과 동일한 기능을 제공
+- Next.js 설치
+React 기반의 SSR(서버 사이드 렌더링) 웹 프레임워크
+c:\ReactProject>npx create-next-app@latest web-app
+Need to install the following packages:
+create-next-app@15.2.2
+Ok to proceed? (y) y
+
+√ Would you like to use TypeScript? ... No / Yes
+√ Would you like to use ESLint? ... No / Yes
+√ Would you like to use Tailwind CSS? ... No / Yes
+√ Would you like your code inside a `src/` directory? ... No / Yes
+√ Would you like to use App Router? (recommended) ... No / Yes
+√ Would you like to use Turbopack for `next dev`? ... No / Yes
+√ Would you like to customize the import alias (`@/*` by default)? ... No / Yes
+√ What import alias would you like configured? ... skin_care_app/*
+Creating a new Next.js app in c:\ReactProject\web-app.
+
+Using npm.
+
+Initializing project with template: app-tw
 
 
+Installing dependencies:
+- react
+- react-dom
+- next
+
+Installing devDependencies:
+- typescript
+- @types/node
+- @types/react
+- @types/react-dom
+- @tailwindcss/postcss
+- tailwindcss
+- eslint
+- eslint-config-next
+- @eslint/eslintrc
 
 
+added 312 packages, and audited 313 packages in 22s
+
+129 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+Initialized a git repository.
+
+Success! Created web-app at c:\ReactProject\web-app
+
+8) AR(증강현실) 기반 피부 진단
+React Native에서 ARKit(iOS) 또는 ARCore(Android)를 사용하여 증강 현실을 구현
+c:\ReactProject>npm install react-native-arkit
+npm error code ERESOLVE
+npm error ERESOLVE could not resolve
+npm error
+npm error While resolving: undefined@undefined
+npm error Found: react@18.3.1
+npm error node_modules/react
+npm error   peer react@"^16.8.0 || ^17.0.0 || ^18.0.0" from react-query@3.39.3
+npm error   node_modules/react-query
+npm error     react-query@"^3.39.3" from the root project
+npm error
+npm error Could not resolve dependency:
+npm error react-native-arkit@"*" from the root project
+npm error
+npm error Conflicting peer dependency: react@19.0.0
+npm error node_modules/react
+npm error   peer react@"^19.0.0" from react-native@0.78.0
+npm error   node_modules/react-native
+npm error     peer react-native@">=0.46.0" from react-native-arkit@0.9.0
+npm error     node_modules/react-native-arkit
+npm error       react-native-arkit@"*" from the root project
+npm error
+npm error Fix the upstream dependency conflict, or retry
+npm error this command with --force or --legacy-peer-deps
+npm error to accept an incorrect (and potentially broken) dependency resolution.
+npm error
+npm error
+npm error For a full report see:
+npm error C:\Users\nayou\AppData\Local\npm-cache\_logs\2025-03-14T07_06_02_059Z-eresolve-report.txt
+npm error A complete log of this run can be found in: C:\Users\nayou\AppData\Local\npm-cache\_logs\2025-03-14T07_06_02_059Z-debug-0.log
+
+c:\ReactProject>npm install react-native-arcore
+
+added 1 package, and audited 170 packages in 1s
+
+14 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+9) QR 코드 생성
+QR 코드를 생성하여 피부 상태를 빠르게 공유
+c:\ReactProject>npm install react-native-qrcode-svg
+npm error code ERESOLVE
+npm error ERESOLVE could not resolve
+npm error
+npm error While resolving: undefined@undefined
+npm error Found: react@18.3.1
+npm error node_modules/react
+npm error   peer react@"^16.8.0 || ^17.0.0 || ^18.0.0" from react-query@3.39.3
+npm error   node_modules/react-query
+npm error     react-query@"^3.39.3" from the root project
+npm error
+npm error Could not resolve dependency:
+npm error react-native-qrcode-svg@"*" from the root project
+npm error
+npm error Conflicting peer dependency: react@19.0.0
+npm error node_modules/react
+npm error   peer react@"^19.0.0" from react-native@0.78.0
+npm error   node_modules/react-native
+npm error     peer react-native@">=0.63.4" from react-native-qrcode-svg@6.3.15
+npm error     node_modules/react-native-qrcode-svg
+npm error       react-native-qrcode-svg@"*" from the root project
+npm error     peer react-native@"*" from react-native-svg@15.11.2
+npm error     node_modules/react-native-svg
+npm error       peer react-native-svg@">=14.0.0" from react-native-qrcode-svg@6.3.15
+npm error       node_modules/react-native-qrcode-svg
+npm error         react-native-qrcode-svg@"*" from the root project
+npm error
+npm error Fix the upstream dependency conflict, or retry
+npm error this command with --force or --legacy-peer-deps
+npm error to accept an incorrect (and potentially broken) dependency resolution.
+npm error
+npm error
+npm error For a full report see:
+npm error C:\Users\nayou\AppData\Local\npm-cache\_logs\2025-03-14T07_06_35_825Z-eresolve-report.txt
+npm error A complete log of this run can be found in: C:\Users\nayou\AppData\Local\npm-cache\_logs\2025-03-14T07_06_35_825Z-debug-0.log
