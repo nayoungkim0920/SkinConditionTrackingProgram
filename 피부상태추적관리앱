@@ -1008,42 +1008,21 @@ ReactProject@ c:\ReactProject
 
 6) Figma 디자인 적용 (UI/UX 디자인)
 최신 UI 디자인 트렌드를 Figma로 디자인하고 React Native에 반영
-- Figma 디자인
-c:\ReactProject>npm install react-native-paper react-navigation
-npm error code ERESOLVE
-npm error ERESOLVE could not resolve
-npm error
-npm error While resolving: undefined@undefined
-npm error Found: react@18.3.1
-npm error node_modules/react
-npm error   peer react@"^16.8.0 || ^17.0.0 || ^18.0.0" from react-query@3.39.3
-npm error   node_modules/react-query
-npm error     react-query@"^3.39.3" from the root project
-npm error
-npm error Could not resolve dependency:
-npm error react-native-paper@"*" from the root project
-npm error
-npm error Conflicting peer dependency: react@19.0.0
-npm error node_modules/react
-npm error   peer react@"^19.0.0" from react-native@0.78.0
-npm error   node_modules/react-native
-npm error     peer react-native@"*" from react-native-paper@5.13.1
-npm error     node_modules/react-native-paper
-npm error       react-native-paper@"*" from the root project
-npm error     peer react-native@"*" from react-native-safe-area-context@5.3.0
-npm error     node_modules/react-native-safe-area-context
-npm error       peer react-native-safe-area-context@"*" from react-native-paper@5.13.1
-npm error       node_modules/react-native-paper
-npm error         react-native-paper@"*" from the root project
-npm error
-npm error Fix the upstream dependency conflict, or retry
-npm error this command with --force or --legacy-peer-deps
-npm error to accept an incorrect (and potentially broken) dependency resolution.
-npm error
-npm error
-npm error For a full report see:
-npm error C:\Users\nayou\AppData\Local\npm-cache\_logs\2025-03-14T07_00_34_243Z-eresolve-report.txt
-npm error A complete log of this run can be found in: C:\Users\nayou\AppData\Local\npm-cache\_logs\2025-03-14T07_00_34_243Z-debug-0.log
+- Figma 디자인(peer dependency 충돌을 무시하고 설치)
+c:\ReactProject>npm install react-native-paper react-navigation --legacy-peer-deps
+npm warn deprecated react-navigation@5.0.0: This package is no longer supported. Please use @react-navigation/native instead. See https://reactnavigation.org/docs/getting-started/ for usage guide
+
+added 13 packages, and audited 209 packages in 5s
+
+26 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+npm notice
+npm notice New major version of npm available! 10.9.2 -> 11.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.2.0
+npm notice To update run: npm install -g npm@11.2.0
+npm notice
 
 7) Web 서비스 제공(React.js + Next.js)
 웹 서비스에서 모바일 앱과 동일한 기능을 제공
@@ -1098,45 +1077,11 @@ Success! Created web-app at c:\ReactProject\web-app
 
 8) AR(증강현실) 기반 피부 진단
 React Native에서 ARKit(iOS) 또는 ARCore(Android)를 사용하여 증강 현실을 구현
-c:\ReactProject>npm install react-native-arkit
-npm error code ERESOLVE
-npm error ERESOLVE could not resolve
-npm error
-npm error While resolving: undefined@undefined
-npm error Found: react@18.3.1
-npm error node_modules/react
-npm error   peer react@"^16.8.0 || ^17.0.0 || ^18.0.0" from react-query@3.39.3
-npm error   node_modules/react-query
-npm error     react-query@"^3.39.3" from the root project
-npm error
-npm error Could not resolve dependency:
-npm error react-native-arkit@"*" from the root project
-npm error
-npm error Conflicting peer dependency: react@19.0.0
-npm error node_modules/react
-npm error   peer react@"^19.0.0" from react-native@0.78.0
-npm error   node_modules/react-native
-npm error     peer react-native@">=0.46.0" from react-native-arkit@0.9.0
-npm error     node_modules/react-native-arkit
-npm error       react-native-arkit@"*" from the root project
-npm error
-npm error Fix the upstream dependency conflict, or retry
-npm error this command with --force or --legacy-peer-deps
-npm error to accept an incorrect (and potentially broken) dependency resolution.
-npm error
-npm error
-npm error For a full report see:
-npm error C:\Users\nayou\AppData\Local\npm-cache\_logs\2025-03-14T07_06_02_059Z-eresolve-report.txt
-npm error A complete log of this run can be found in: C:\Users\nayou\AppData\Local\npm-cache\_logs\2025-03-14T07_06_02_059Z-debug-0.log
-
-c:\ReactProject>npm install react-native-arcore
-
-added 1 package, and audited 170 packages in 1s
-
-14 packages are looking for funding
-  run `npm fund` for details
-
-found 0 vulnerabilities
+c:\ReactProject>
+rmdir /s /q node_modules
+del /f /q package-lock.json
+npm cache clean --force
+npm install --legacy-peer-deps
 
 9) QR 코드 생성
 QR 코드를 생성하여 피부 상태를 빠르게 공유
